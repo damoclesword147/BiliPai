@@ -9,6 +9,7 @@ import com.android.purebilibili.feature.video.ui.components.RelatedVideoList
 import com.android.purebilibili.core.ui.AppContentColors
 
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.filled.AutoAwesome
 
 import com.android.purebilibili.navigation.animatePagerSelection
 import com.android.purebilibili.core.ui.components.AppIcon
@@ -1318,7 +1319,7 @@ internal fun VideoContentSection(
                 cid = info.cid,
                 title = info.title,
                 ownerName = info.owner.name,
-                durationMs = videoDurationMs,
+                durationMs = info.pages.firstOrNull { it.cid == info.cid }?.duration?.times(1000L) ?: info.pages.firstOrNull()?.duration?.times(1000L) ?: 0L,
                 upMid = info.owner.mid
             )
         )
@@ -2370,7 +2371,7 @@ internal fun VideoContentTabBar(
                     modifier = Modifier.size(36.dp),
                 ) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Outlined.AutoAwesome,
+                        imageVector = androidx.compose.material.icons.Icons.Filled.AutoAwesome,
                         contentDescription = "AI 视频总结",
                         tint = AppContentColors.secondaryText(),
                         modifier = Modifier.size(18.dp)

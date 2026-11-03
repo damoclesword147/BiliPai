@@ -1,7 +1,7 @@
 package com.android.purebilibili.feature.video.summary
 
 import android.content.Context
-import com.android.purebilibili.data.model.response.DashAudio
+import com.android.purebilibili.data.model.response.getBestAudio
 import com.android.purebilibili.data.repository.VideoRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -26,36 +26,18 @@ object AudioPreparation {
      */
     suspend fun resolveAudioUrl(bvid: String, cid: Long): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val playUrlResult = VideoRepository.getPlayUrl(bvid, cid)
-            val playData = playUrlResult.getOrNull()
+            val playData = VideoRepository.getPlayUrlData(bvid = bvid, cid = cid, qn = 64)
                 ?: return@withContext Result.failure(Exception("无法获取视频播放流信息"))
 
             val dash = playData.dash
                 ?: return@withContext Result.failure(Exception("当前视频无 DASH 流，无法提取音轨"))
 
-            val audios = dash.audio.orEmpty()
-            if (audios.isEmpty()) {
-                return@withContext Result.failure(Exception("当前视频未包含独立音频轨道"))
-            }
-
-            // 优先选择带宽较低的普通 AAC 音轨（人声转写 64k/128k 足够，体积更小下载更快）
-            val selectedAudio = audios
-                .filter { it.codecs.contains("mp4a", ignoreCase = true) || it.codecid == 0 }
-                .minByOrNull { it.bandwidth }
-                ?: audios.minByOrNull { it.bandwidth }
-                ?: audios.first()
-
-            val url = selectedAudio.baseUrl.ifBlank {
-                selectedAudio.base_url.ifBlank {
-                    selectedAudio.backupUrl?.firstOrNull() ?: selectedAudio.backup_url?.firstOrNull().orEmpty()
-                }
-            }
-
-            if (url.isBlank()) {
+            val audioUrl = dash.getBestAudio()?.getValidUrl()
+            if (audioUrl.isNullOrBlank()) {
                 return@withContext Result.failure(Exception("音频流下载地址为空"))
             }
 
-            Result.success(url)
+            Result.success(audioUrl)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

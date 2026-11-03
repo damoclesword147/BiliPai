@@ -1967,7 +1967,7 @@ private fun ScrollableVideoInfoSection(
             cid = info.cid,
             title = info.title,
             ownerName = info.owner.name,
-            durationMs = info.duration * 1000L,
+            durationMs = info.pages.firstOrNull { it.cid == info.cid }?.duration?.times(1000L) ?: info.pages.firstOrNull()?.duration?.times(1000L) ?: 0L,
             upMid = info.owner.mid
         )
     )
