@@ -79,6 +79,7 @@ import com.android.purebilibili.feature.video.note.VideoNoteUiState
 import com.android.purebilibili.feature.video.note.buildVideoNoteShareText
 import com.android.purebilibili.feature.video.ui.section.ActionButtonsRow
 import com.android.purebilibili.feature.video.ui.section.AiSummarySheet
+import com.android.purebilibili.feature.video.summary.VideoIdentity
 import com.android.purebilibili.feature.video.ui.section.VideoNoteListSheet
 import com.android.purebilibili.feature.video.ui.section.VideoSupplementStatsActions
 import com.android.purebilibili.feature.video.ui.section.VideoNoteDeleteConfirmDialog
@@ -1960,7 +1961,15 @@ private fun ScrollableVideoInfoSection(
         onCreateNoteDraft = {
             showAiSummarySheet = false
             onCreateNoteDraftFromAiSummary()
-        }
+        },
+        videoIdentity = VideoIdentity(
+            bvid = info.bvid,
+            cid = info.cid,
+            title = info.title,
+            ownerName = info.owner.name,
+            durationMs = info.duration * 1000L,
+            upMid = info.owner.mid
+        )
     )
 
     VideoNoteListSheet(

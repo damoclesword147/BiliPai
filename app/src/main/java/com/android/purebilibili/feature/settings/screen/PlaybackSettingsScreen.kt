@@ -1,5 +1,6 @@
 // 文件路径: feature/settings/PlaybackSettingsScreen.kt
 package com.android.purebilibili.feature.settings
+import com.android.purebilibili.feature.video.summary.AiSummarySettingsDialog
 
 import com.android.purebilibili.core.ui.AppContentColors
 import com.android.purebilibili.core.ui.components.AppIcon
@@ -1770,6 +1771,18 @@ SettingsItemAnchor("playback.video_tag_size_preset") {
                 iconTint = AppContentColors.secondaryText()
             )
         }
+        AppPreferenceDivider()
+        var showAiSummarySettingsDialog by remember { mutableStateOf(false) }
+        AppPreference(
+            icon = rememberSettingsSemanticIcon(SettingsIconRole.AI_SUMMARY),
+            title = "自定义 AI 总结与 ASR 设置",
+            subtitle = "配置自定义 OpenAI / ASR 接口端点、模型与 API Key",
+            onClick = { showAiSummarySettingsDialog = true }
+        )
+        AiSummarySettingsDialog(
+            visible = showAiSummarySettingsDialog,
+            onDismiss = { showAiSummarySettingsDialog = false }
+        )
         AppPreferenceDivider()
         SettingsItemAnchor("playback.video_note_enabled") {
             AppSwitchPreference(

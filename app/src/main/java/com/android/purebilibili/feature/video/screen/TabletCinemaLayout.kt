@@ -148,6 +148,7 @@ import com.android.purebilibili.feature.video.ui.section.VideoPlayerSection
 import com.android.purebilibili.feature.video.ui.section.VideoPlayerSectionActions
 import com.android.purebilibili.feature.video.ui.section.VideoPlayerSectionState
 import com.android.purebilibili.feature.video.ui.section.AiSummarySheet
+import com.android.purebilibili.feature.video.summary.VideoIdentity
 import com.android.purebilibili.feature.video.ui.section.VideoNoteListSheet
 import com.android.purebilibili.feature.video.ui.section.VideoSupplementStatsActions
 import com.android.purebilibili.feature.video.ui.section.VideoNoteDeleteConfirmDialog
@@ -1086,7 +1087,15 @@ private fun CinemaVideoIntroSection(
             onCreateNoteDraft = {
                 showAiSummarySheet = false
                 onCreateNoteDraftFromAiSummary()
-            }
+            },
+            videoIdentity = VideoIdentity(
+                bvid = success.info.bvid,
+                cid = success.info.cid,
+                title = success.info.title,
+                ownerName = success.info.owner.name,
+                durationMs = success.videoDurationMs,
+                upMid = success.info.owner.mid
+            )
         )
         VideoNoteListSheet(
             visible = showNoteListSheet,

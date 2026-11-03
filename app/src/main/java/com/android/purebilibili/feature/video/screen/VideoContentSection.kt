@@ -126,6 +126,7 @@ import com.android.purebilibili.feature.dynamic.components.ImagePreviewSourceAnc
 import com.android.purebilibili.core.ui.AdaptiveLoadingIndicator
 import com.android.purebilibili.data.model.response.AiSummaryData
 import com.android.purebilibili.feature.video.ui.section.AiSummarySheet
+import com.android.purebilibili.feature.video.summary.VideoIdentity
 import com.android.purebilibili.feature.video.ui.section.VideoSupplementStatsActions
 import com.android.purebilibili.feature.video.ui.section.VideoNoteListSheet
 import com.android.purebilibili.feature.video.ui.section.VideoNoteDeleteConfirmDialog
@@ -1131,6 +1132,7 @@ internal fun VideoContentSection(
         ) {
             VideoContentTabBar(
                 tabs = tabs,
+                onAiSummaryClick = { showAiSummarySheet = true },
                 // 玻璃外壳对齐 UP 头像：MD3 为 16dp，Miuix 为 12dp；原生保留默认布局。
                 liquidGlassAlignShellStart = true,
                 liquidGlassTabsOffsetX = if (LocalAppUiStyle.current == AppUiStyle.MIUIX) (-4).dp else 0.dp,
@@ -1310,7 +1312,15 @@ internal fun VideoContentSection(
             onCreateNoteDraft = {
                 showAiSummarySheet = false
                 onCreateNoteDraftFromAiSummary()
-            }
+            },
+            videoIdentity = VideoIdentity(
+                bvid = info.bvid,
+                cid = info.cid,
+                title = info.title,
+                ownerName = info.owner.name,
+                durationMs = videoDurationMs,
+                upMid = info.owner.mid
+            )
         )
 
         VideoNoteListSheet(
@@ -2264,6 +2274,7 @@ internal fun VideoContentTabBar(
     liquidGlassTabsOffsetX: Dp = 0.dp,
     liquidGlassAlignShellStart: Boolean = false,
     liquidGlassAdaptIndicatorToLabel: Boolean = false,
+    onAiSummaryClick: (() -> Unit)? = null,
 ) {
     val liquidGlassEnabledForTabBar = LocalAppThemeConfig.current.liquidGlassEnabled
     val configuration = LocalConfiguration.current
@@ -2352,6 +2363,20 @@ internal fun VideoContentTabBar(
                 isPagerDraggingProvider = isPagerDraggingProvider,
                 pagerTargetPositionProvider = pagerTargetPositionProvider,
             )
+
+            if (onAiSummaryClick != null) {
+                com.android.purebilibili.core.ui.components.AppIconButton(
+                    onClick = onAiSummaryClick,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Outlined.AutoAwesome,
+                        contentDescription = "AI 视频总结",
+                        tint = AppContentColors.secondaryText(),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
 
             if (showDanmakuActions && shouldShowVideoContentTabBarDanmakuActions(selectedTabIndex)) {
                 Row(

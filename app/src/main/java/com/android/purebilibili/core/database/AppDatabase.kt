@@ -12,16 +12,19 @@ import com.android.purebilibili.core.database.entity.BlockedUp
 import com.android.purebilibili.core.database.dao.BlockedUpDao
 import com.android.purebilibili.core.database.dao.CommentFraudDao
 import com.android.purebilibili.core.database.entity.CommentFraudRecord
+import com.android.purebilibili.core.database.dao.AiSummaryCacheDao
+import com.android.purebilibili.core.database.entity.AiSummaryCacheEntity
 
 @Database(
-    entities = [SearchHistory::class, BlockedUp::class, CommentFraudRecord::class],
-    version = 7,
+    entities = [SearchHistory::class, BlockedUp::class, CommentFraudRecord::class, AiSummaryCacheEntity::class],
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun blockedUpDao(): BlockedUpDao
     abstract fun commentFraudDao(): CommentFraudDao
+    abstract fun aiSummaryCacheDao(): AiSummaryCacheDao
 
     companion object {
         @Volatile
@@ -34,11 +37,31 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "app_database"
                 )
-                    .addMigrations(MIGRATION_3_4, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_3_4, MIGRATION_6_7, MIGRATION_7_8)
                     .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `ai_summary_cache` (
+                        `cacheKey` TEXT NOT NULL,
+                        `bvid` TEXT NOT NULL,
+                        `cid` INTEGER NOT NULL,
+                        `source` TEXT NOT NULL,
+                        `resultJson` TEXT NOT NULL,
+                        `transcriptJson` TEXT,
+                        `createdAt` INTEGER NOT NULL,
+                        `lastAccessAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`cacheKey`)
+                    )
+                    """.trimIndent()
+                )
             }
         }
 
