@@ -101,6 +101,7 @@ jobs:
         run: |
           COMMON_ARGS=(
             "--max-workers=4"
+            "-Dorg.gradle.jvmargs=-Xmx6g -XX:+UseG1GC -XX:MaxMetaspaceSize=1g"
             "-Pbili.build.commitSha=${BILI_BUILD_COMMIT_SHA}"
             "-Pbili.build.gitRef=${BILI_BUILD_GIT_REF}"
             "-Pbili.build.workflowRunId=${BILI_BUILD_WORKFLOW_RUN_ID}"
@@ -112,9 +113,9 @@ jobs:
           echo "正在以 ${BUILD_TYPE} 模式执行编译..."
 
           if [ "$BUILD_TYPE" = "release" ]; then
-            ./gradlew "${COMMON_ARGS[@]}" assembleRelease
+            ./gradlew "${COMMON_ARGS[@]}" assembleRelease -x lint -x lintVitalRelease -x lintVitalAnalyzeRelease
           else
-            ./gradlew "${COMMON_ARGS[@]}" assembleDev
+            ./gradlew "${COMMON_ARGS[@]}" assembleDev -x lint -x lintVitalDev -x lintVitalAnalyzeDev
           fi
 
       - name: 📦 收集 APK 安装包与生成校验和

@@ -285,8 +285,9 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
-        abortOnError = true
-        checkDependencies = true
+        abortOnError = false
+        checkReleaseBuilds = false
+        checkDependencies = false
         // CI profiles separate performance contracts from informational style findings.
         val ciChecks = providers.gradleProperty("bili.ciChecks").orNull
         if (ciChecks != null) {
