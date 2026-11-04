@@ -568,3 +568,41 @@ fun VideoNoteListSheet(
         }
     }
 }
+
+
+/** PiliPlus 式底部操作栏：官方 H5 编辑器 + 内置编辑器双入口。 */
+@Composable
+private fun VideoNoteSheetFooter(
+    isLoggedIn: Boolean,
+    onOfficialEditorClick: () -> Unit,
+    onCreateOrEditClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        AppButton(
+            onClick = onOfficialEditorClick,
+            enabled = isLoggedIn,
+            modifier = Modifier.weight(1f),
+        ) {
+            AppText(if (isLoggedIn) "开始记笔记" else "登录后开始记笔记")
+        }
+        AppButton(
+            onClick = onCreateOrEditClick,
+            modifier = Modifier.weight(1f),
+        ) {
+            AppText("内置编辑器")
+        }
+    }
+    if (!isLoggedIn) {
+        AppText(
+            text = "官方笔记编辑器需要登录 B 站账号",
+            style = MaterialTheme.typography.labelSmall,
+            color = AppContentColors.secondaryText(),
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+    }
+}
